@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:16
+    container_name: prm_postgres
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: prm_user
+      POSTGRES_PASSWORD: prm_password
+      POSTGRES_DB: prm_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U prm_user -d prm_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: prm_pgadmin
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@example.com"
+      PGADMIN_DEFAULT_PASSWORD: "admin"
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "False"
+      PGADMIN_CONFIG_LOGIN_BANNER: "'PRM Development Environment'"
+      GUNICORN_TIMEOUT: "120"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data: 
